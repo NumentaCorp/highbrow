@@ -1,6 +1,2 @@
-node_modules/
-coverage/
-doc/
-.nyc_output/
 .idea/
 .DS_Store/
