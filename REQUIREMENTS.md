@@ -43,7 +43,6 @@ Highbrow should provide a way to visualize an HTM network in three dimensional s
 
 - Neuron
 - Layer
-- Mini Column <small>[1]</small>
 - Cortical Column
 - Network
 
@@ -53,11 +52,13 @@ Where the following is true:
 1. All renderable object origin points are global Cartesian XYZ coordinates, not relative to any containing parent object.
 1. A Neuron can be in one of many states, which may affect rendering.
 1. Layers are collections of Neurons into a 3D grid, where the Y dimension indicates Mini Column structures (if they exist).
-1. Layers must expose Neurons by global cell index within the Layer as well as XYZ **_position_** in the grid (_not X,Y,Z coordinate_) <small>[2]</small>
+1. Layers must expose Neurons by global cell index within the Layer as well as XYZ **_position_** in the grid (_not X,Y,Z coordinate_) <small>[\*]</small>
 1. Layers may contain MiniColumn structures, which should be identifiable visually. Both active columns and individual Neuron states should be visible simultaneously.
 1. Cortical Columns contain one or more Layers in a list. (more details about Layer ordering coming soon)
 1. A Network contains one or more Cortical Columns in a list.
 
-> [1] The Mini Column is not currently a renderable object. It doesn't necessarily need to be be, as long as it can be displayed properly from within a Layer.
+> [\*] There is a one-way transform from grid position to XYZ coordinate. There is no need to transform from Cartesian XYZ coordinates into a grid position. The rendering adapters will be calling functions to transform Neurons from position into coordinate immediately upon rendering. All Neuron state access should be performed using global cell index or grid position.
 
-> [2] There is a one-way transform from grid position to XYZ coordinate. There is no need to transform from Cartesian XYZ coordinates into a grid position. The rendering adapters will be calling functions to transform Neurons from position into coordinate immediately upon rendering. All Neuron state access should be performed using global cell index or grid position.
+## Mini-Columns
+
+Although mini-columns are not Renderable objects (they are essentially a list of Renderable Neuron objects), client code must still be able to access these structures in order to render them with different visual aspects. Each Layer object MAY contain mini-column structures, and it should be easy to inspect for them. If a Layer contains mini-columns, Neurons within a Layer should contain an API to expose the mini-column index it exists within. This will allow client code to render neurons with the knowledge of what mini-column they are in, and whether that column is currently active.
