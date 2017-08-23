@@ -4,28 +4,31 @@
 
 Currently under development. See design at [DESIGN](DESIGN.md) for motivation and notes. For more up-to-date architecture, build docs below.
 
-## Install
+## WebGL Platfom
+
+You can find the WebGL sources in the [platform/webgl](platform/webgl) directory.
+
+### Install WebGL dependencies
 
     npm install .
 
-## Test
+### Test
 
     npm test
 
-## Build docs
+### Build docs
 
     ./node_modules/.bin/esdoc
     open docs/index.html
 
-## Build Bundle
+### Build Bundle
 
     npm run build
 
 Installs into `bin/highbrow-{X.Y.Z}.bundle.js`.
 
-## Examples
+### Examples
 
-### WEBGL
 
 There is a simple WEBGL example in [`examples/webgl`](examples/webgl/). This example interfaces with [cell-viz](https://github.com/numenta/cell-viz), an existing platform I've used for HTM cell rendering in THREE.JS. For details, see [`HighbrowLayerVisualization`](https://github.com/numenta/cell-viz/blob/master/src/HighbrowLayerVisualization.js).
 
