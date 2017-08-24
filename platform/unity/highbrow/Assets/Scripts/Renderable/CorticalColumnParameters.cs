@@ -19,21 +19,17 @@ using UnityEngine;
 namespace Numenta.Renderable
 {
     [Serializable]
-    public struct LayerParameters
+    public struct CorticalColumnParameters
     {
-        [Tooltip("Layer Name")]
+        [Tooltip("Column Name")]
         public string name;
-        [Tooltip("Number of minicolumns per dimension")]
-        public Vector2 dimensions;
-        [Tooltip("Minicolumn Parameters")]
-        public MiniColumnParameters minicolumnParameters;
-        [Tooltip("Spacing between layers")]
+		[Tooltip("Column Layers")]
+		public LayerParameters[] layers;
+        [Tooltip("Spacing between columns")]
         public float spacing;
 
-        public static readonly LayerParameters DEFAULT = new LayerParameters
+        public static readonly CorticalColumnParameters DEFAULT = new CorticalColumnParameters
         {
-            dimensions = Vector2.one,
-            minicolumnParameters = MiniColumnParameters.DEFAULT,
             spacing = 0
         };
     }

@@ -63,6 +63,7 @@ namespace Numenta.Renderable
         void Start()
         {
             StartCoroutine(InstantiateMinicolumns());
+            this.name = parameters.name;
         }
         IEnumerator Blink(Neuron cell, Neuron.State state, float seconds = 1f)
         {
@@ -98,24 +99,28 @@ namespace Numenta.Renderable
                 StartCoroutine(Blink(cell, Neuron.State.Depolarized));
             }
         }
+        public Vector3 GetSize()
+        {
+            float cellSize = parameters.minicolumnParameters.cellSize;
+            float cellSpacing = parameters.minicolumnParameters.cellSpacing;
+            int numOfCells = parameters.minicolumnParameters.numOfCells;
+            float cellWidth = cellSize + cellSpacing;
+            float x = parameters.dimensions.x;
+            float y = parameters.dimensions.y;
+            return new Vector3(cellWidth * x, numOfCells * cellWidth, cellWidth * y);
+        }
+
         /// <summary>
         /// Callback to draw gizmos that are pickable and always drawn.
         /// </summary>
         void OnDrawGizmos()
         {
             Gizmos.color = new Color(0, 1, 0, 0.5f);
-            var cellSize = parameters.minicolumnParameters.cellSize;
-            var cellSpacing = parameters.minicolumnParameters.cellSpacing;
-            var numOfCells = parameters.minicolumnParameters.numOfCells;
-            var x = parameters.dimensions.x;
-            var y = parameters.dimensions.y;
-            Vector3 size = new Vector3((cellSize + cellSpacing) * x,
-                            numOfCells * (cellSize + cellSpacing),
-                            (cellSize + cellSpacing) * y);
-            Vector3 offset = new Vector3(
-                -(cellSize + cellSpacing) / 2,
-                size.y / 2,
-                -(cellSize + cellSpacing) / 2);
+            float cellSize = parameters.minicolumnParameters.cellSize;
+            float cellSpacing = parameters.minicolumnParameters.cellSpacing;
+            float halfWidth = (cellSize + cellSpacing) / 2f;
+            Vector3 size = GetSize();
+            Vector3 offset = new Vector3(-halfWidth, size.y / 2f, -halfWidth);
             Gizmos.DrawCube(transform.position + offset, size);
         }
     }
