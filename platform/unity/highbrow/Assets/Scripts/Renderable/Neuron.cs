@@ -16,6 +16,9 @@ using UnityEngine;
 
 namespace Numenta.Renderable
 {
+    /// <summary>
+    /// This class represents a single neuron
+    /// </summary>
     public class Neuron : MonoBehaviour
     {
         public enum CellType
@@ -31,40 +34,21 @@ namespace Numenta.Renderable
             Active,
             Depolarized
         }
+
         [Tooltip("Material associated with the 'Active' state")]
         public Material activeColor;
         [Tooltip("Material associated with the 'Inactive' state")]
         public Material inactiveColor;
         [Tooltip("Material associated with the 'Depolarized' state")]
         public Material depolarizedColor;
-
         [Tooltip("Cell Type")]
         public CellType cerllType;
-
         [Tooltip("Current neuron state")]
         public State state = State.Inactive;
 
-        /// <summary>
-        /// Callback to draw gizmos that are pickable and always drawn.
-        /// </summary>
-        void OnDrawGizmos()
-        {
-            Mesh mesh = GetComponent<MeshFilter>().mesh;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawWireMesh(mesh);
-        }
-
         State _oldState = State.Inactive;
 
-        /// <summary>
-        /// Update is called every frame, if the MonoBehaviour is enabled.
-        /// </summary>
         void Update()
-        {
-            UpdateState();
-        }
-
-        void UpdateState()
         {
             if (state == _oldState)
             {
@@ -88,5 +72,5 @@ namespace Numenta.Renderable
             }
             _oldState = state;
         }
-    }
+	}
 }

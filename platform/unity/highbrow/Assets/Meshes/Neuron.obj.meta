@@ -1,17 +1,17 @@
 fileFormatVersion: 2
-guid: e0eec0e8b1bd74ebdbd32b31845aefc0
-timeCreated: 1503352406
+guid: 358abe5ce65aa416fb095d54ef1eb0ee
+timeCreated: 1503870424
 licenseType: Free
 ModelImporter:
   serializedVersion: 21
   fileIDToRecycleName:
-    100000: Pyramidal
+    100000: Neuron
     100002: //RootNode
-    400000: Pyramidal
+    400000: Neuron
     400002: //RootNode
-    2300000: Pyramidal
-    3300000: Pyramidal
-    4300000: Pyramidal
+    2300000: Neuron
+    3300000: Neuron
+    4300000: Neuron
   materials:
     importMaterials: 1
     materialName: 0

@@ -14,6 +14,7 @@
 // http://numenta.org/licenses/
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
 
 namespace Numenta.Renderable
@@ -24,6 +25,30 @@ namespace Numenta.Renderable
         public CorticalColumnParameters parameters;
 
         /// <summary>
+        /// Calculate the Column size based on the given <see cref="CorticalColumnParameters"/>.
+        /// </summary>
+        /// <returns>The column size in local coordinates</returns>
+        /// <param name="parameters">Parameters used to calculate the size</param>
+        public static Vector3 GetSize(CorticalColumnParameters parameters)
+        {
+            Vector3 size = new Vector3();
+            var layers = parameters.layers;
+            if (layers != null)
+            {
+                for (int i = 0; i < layers.Length; i++)
+                {
+                    Vector3 layerSize = Layer.GetSize(layers[i]);
+                    size.x = Math.Max(size.x, layerSize.x);
+                    size.y += layerSize.y + parameters.spacing;
+                    size.z = Math.Max(size.z, layerSize.z);
+                }
+                // Remove spacing from top
+                size.y -= parameters.spacing;
+            }
+            return size;
+        }
+
+        /// <summary>
         /// Instantiates the layers. Each Layer will be positioned below 
         /// the preceeding Layer
         /// </summary>
@@ -31,25 +56,29 @@ namespace Numenta.Renderable
         IEnumerator InstantiateLayers()
         {
             GameObject prefab = Resources.Load("prefabs/Layer") as GameObject;
-            float yPos = 0;
             var layers = parameters.layers;
-            for (int i = layers.Length - 1; i >= 0; i--)
+            if (layers != null && layers.Length > 0)
             {
-                GameObject obj = Instantiate(prefab, transform);
-                Layer layer = obj.GetComponent<Layer>();
-                layer.parameters = layers[i];
+                Vector3 colsize = GetSize(parameters);
+                Vector3 size = Layer.GetSize(layers[0]);
+                Vector3 offset = (colsize.y - size.y) / 2 * Vector3.down;
+                Vector3 location = transform.position + offset;
+                for (int i = layers.Length - 1; i >= 0; i--)
+                {
+                    GameObject obj = Instantiate(prefab);
+                    Layer layer = obj.GetComponent<Layer>();
+                    layer.parameters = layers[i];
+                    layer.transform.localPosition = location;
+                    layer.transform.parent = transform;
 
-                float cellSize = layer.parameters.minicolumnParameters.cellSize;
-                float cellSpacing = layer.parameters.minicolumnParameters.cellSpacing;
-                float halfWidth = (cellSize + cellSpacing) / 2f;
-                float spacing = layer.parameters.spacing;
-                Vector3 size = layer.GetSize();
-                Vector3 location = new Vector3(-halfWidth, yPos, -halfWidth);
-                yPos += spacing + size.y;
-                layer.transform.localPosition = location;
+                    size = Layer.GetSize(layers[i]);
+                    location.y += size.y + parameters.spacing;
+                }
             }
             yield return null;
         }
+
+        #region MonoBehaviour
 
         void Start()
         {
@@ -59,29 +88,12 @@ namespace Numenta.Renderable
 
         void OnDrawGizmos()
         {
-            float yPos = 0;
-            Gizmos.color = new Color(0, 1, 0, 0.5f);
-            var layers = parameters.layers;
-            if (layers != null)
-            {
-                for (int i = layers.Length - 1; i >= 0; i--)
-                {
-                    float cellSize = layers[i].minicolumnParameters.cellSize;
-                    float cellSpacing = layers[i].minicolumnParameters.cellSpacing;
-                    int numOfCells = layers[i].minicolumnParameters.numOfCells;
-                    float spacing = layers[i].spacing;
-                    float x = layers[i].dimensions.x;
-                    float y = layers[i].dimensions.y;
-
-                    float cellWidth = cellSize + cellSpacing;
-                    Vector3 size = new Vector3(cellWidth * x, numOfCells * cellWidth, cellWidth * y);
-                    Vector3 offset = new Vector3(-cellWidth, yPos + size.y / 2, -cellWidth);
-                    yPos += spacing + size.y;
-                    Gizmos.DrawCube(transform.position + offset, size);
-                    Handles.Label(transform.position + offset, layers[i].name);
-                }
-            }
-            Handles.Label(transform.position + yPos * Vector3.up, parameters.name);
+            Gizmos.color = new Color(0, 1, 0, 0.15f);
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Vector3 size = GetSize(parameters);
+            Gizmos.DrawCube(Vector3.zero, size);
+            Handles.Label(transform.position + size.y * Vector3.up / 2, parameters.name);
         }
+        #endregion
     }
 }
