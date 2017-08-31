@@ -95,5 +95,6 @@ MonoBehaviour:
   activeColor: {fileID: 2100000, guid: 0e6e951fc63504a4fbbb422b9ce07ad7, type: 2}
   inactiveColor: {fileID: 2100000, guid: b50508f17b0534ca59c55111c3f8c0d8, type: 2}
   depolarizedColor: {fileID: 2100000, guid: f16d6ac2055574dc8882341276f884af, type: 2}
+  burstedColor: {fileID: 2100000, guid: af786e5c3611c4582847ae3449dd195f, type: 2}
   cerllType: 0
   state: 0

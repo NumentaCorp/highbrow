@@ -345,8 +345,8 @@ InputManager:
     m_Name: Camera Yaw
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: /
-    positiveButton: .
+    negativeButton: right shift
+    positiveButton: /
     altNegativeButton: 
     altPositiveButton: 
     gravity: 3
