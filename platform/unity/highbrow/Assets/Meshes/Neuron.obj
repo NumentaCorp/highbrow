@@ -1,25 +1,25 @@
-mtllib ./Pyramidal.mtl
-g Pyramidal
+mtllib ./Neuron.mtl
+g Neuron
 v 0 0 0
-v 1.092785E-08 0 0.25
-v 0.25 0 -2.185569E-08
-v -2.98122E-09 0 -0.25
-v -0.25 0 4.371139E-08
+v 2.185569E-08 0 0.5
+v 0.5 0 -4.371139E-08
+v -5.96244E-09 0 -0.5
+v -0.5 0 8.742278E-08
 v 0 1 0
 v 0 1 0
 v 0 1 0
 v 0 1 0
 v 0 1 0
 v 0 1 0
-v -0.25 0 0
+v -0.5 0 0
 v 0 1 0
-v 1.092785E-08 0 0.25
+v 2.185569E-08 0 0.5
 v 0 1 0
-v 0.25 0 -2.185569E-08
+v 0.5 0 -4.371139E-08
 v 0 1 0
-v -2.98122E-09 0 -0.25
+v -5.96244E-09 0 -0.5
 v 0 1 0
-v -0.25 0 0
+v -0.5 0 0
 
 vn 0 -1 0
 vn 0 -1 0
@@ -63,8 +63,8 @@ vt 0.75 0
 vt 1 1
 vt 1 0
 
-usemtl Default-Diffuse
-usemap Default-Diffuse
+usemtl Neuron Inactive
+usemap Neuron Inactive
 f 2/2/2 1/1/1 3/3/3
 f 3/3/3 1/1/1 4/4/4
 f 4/4/4 1/1/1 5/5/5

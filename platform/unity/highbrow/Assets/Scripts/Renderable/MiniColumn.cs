@@ -13,10 +13,14 @@
 // along with this program.  If not, see http://www.gnu.org/licenses.
 // http://numenta.org/licenses/
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 
 namespace Numenta.Renderable
 {
+    /// <summary>
+    /// This class represents a single MiniColumn composed of <see cref="Neuron"/> 
+    /// </summary>
     public class MiniColumn : MonoBehaviour
     {
         public enum State
@@ -29,30 +33,21 @@ namespace Numenta.Renderable
         [Tooltip("Current Minicolumn state")]
         public State state = State.Inactive;
 
-        IEnumerator InstantiateCells()
+        // Cached state
+        State _oldState = State.Inactive;
+
+        /// <summary>
+        /// Calculate the minicolumn size based on the given <see cref="MiniColumnParameters"/>.
+        /// </summary>
+        /// <returns>The minicolumn size in local coordinates</returns>
+        /// <param name="parameters">Parameters used to calculate the size</param>
+		public static Vector3 GetSize(MiniColumnParameters parameters)
         {
-            GameObject prefab = Resources.Load("prefabs/Neuron") as GameObject;
             int numOfCells = parameters.numOfCells;
-            float cellSpacing = parameters.cellSpacing;
+            float cellSpacing = parameters.spacing;
             float cellSize = parameters.cellSize;
-
-			float margin = cellSpacing / (cellSpacing + cellSize);
-
-			// Scale each cell height based on number of cells per column
-			float height = 1.0f / numOfCells;
-            float scaledMargin = margin / numOfCells;
-            Vector3 size = new Vector3(1 - margin, height - scaledMargin, 1 - margin);
-            for (int i = 0; i < numOfCells; i++)
-            {
-                Vector3 location = new Vector3(0, i * height * 2 - 1, 0);
-                var cell = Instantiate(prefab, transform);
-                cell.transform.localScale = size * 2;
-                cell.transform.localPosition = location;
-                cell.name = "Cell " + (i + 1);
-                var neuron = cell.GetComponent<Neuron>();
-                neuron.cerllType = parameters.cellType;
-            }
-            yield return null;
+            float cellHeight = cellSize + cellSpacing;
+            return new Vector3(cellSize, numOfCells * cellHeight, cellSize);
         }
 
         public Neuron GetNeuron(int i)
@@ -61,34 +56,55 @@ namespace Numenta.Renderable
         }
 
         /// <summary>
-        /// Start is called on the frame when a script is enabled just before
-        /// any of the Update methods is called the first time.
+        /// Coroutine used to instantiate all neurons 
         /// </summary>
+        /// <returns></returns>
+        IEnumerator InstantiateCells()
+        {
+            GameObject prefab = Resources.Load("prefabs/Neuron") as GameObject;
+
+            // Scale each cell height based on number of cells per column
+            float cellSpacing = parameters.spacing;
+            float cellSize = parameters.cellSize;
+            float cellHeight = cellSize + cellSpacing;
+            int numOfCells = parameters.numOfCells;
+
+            Vector3 pos = transform.position;
+            pos.y -= cellHeight * numOfCells / 2;
+            Vector3 size = new Vector3(cellSize, cellSize, cellSize);
+            for (int i = 0; i < numOfCells; i++)
+            {
+                var cell = Instantiate(prefab);
+                cell.transform.localPosition = pos;
+                cell.transform.localScale = size;
+                cell.transform.parent = transform;
+                cell.name = "Cell " + (i + 1);
+                var neuron = cell.GetComponent<Neuron>();
+                neuron.cerllType = parameters.cellType;
+                pos.y += cellHeight;
+            }
+
+            yield return null;
+        }
+
+        #region MonoBehaviour
+
         void Start()
         {
-            // Scale column based on number of cells per column and cell size
-            float cellSize = (parameters.cellSize + parameters.cellSpacing);
-            Vector3 extents = new Vector3(cellSize, parameters.numOfCells * cellSize / 2, cellSize);
-            transform.localScale = extents;
-            // Move bottom of cylinder to bottom of column
-            transform.localPosition += extents.y * Vector3.up;
+            // Cylinder height is double width
+            Vector3 size = GetSize(parameters);
+            size.y /= 2;
+            transform.localScale = size;
             StartCoroutine(InstantiateCells());
         }
 
-        /// <summary>
-        /// Update is called every frame, if the MonoBehaviour is enabled.
-        /// </summary>
         void Update()
-        {
-            UpdateState();
-        }
-        State _oldState = State.Inactive;
-        void UpdateState()
         {
             if (state == _oldState)
             {
                 return;
             }
+            // Show or hide the minicolum depending on the state
             Renderer rend = gameObject.GetComponent<Renderer>();
             switch (state)
             {
@@ -99,21 +115,19 @@ namespace Numenta.Renderable
                     rend.enabled = false;
                     break;
                 default:
-					rend.enabled = false;
-					break;
+                    rend.enabled = false;
+                    break;
             }
             _oldState = state;
         }
-        /// <summary>
-        /// Callback to draw gizmos that are pickable and always drawn.
-        /// </summary>
         void OnDrawGizmos()
         {
-            Vector3 size = new Vector3(parameters.cellSize,
-                            parameters.numOfCells * (parameters.cellSize + parameters.cellSpacing),
-                            parameters.cellSize);
+            if (EditorApplication.isPlaying) return;
+
             Gizmos.color = new Color(1, 0, 0, 0.5f);
-            Gizmos.DrawCube(transform.position + size.y * Vector3.up / 2, size);
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawCube(Vector3.zero, GetSize(parameters));
         }
+        #endregion
     }
 }

@@ -80,7 +80,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1603501855187206}
-  m_Mesh: {fileID: 4300000, guid: e0eec0e8b1bd74ebdbd32b31845aefc0, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 358abe5ce65aa416fb095d54ef1eb0ee, type: 3}
 --- !u!114 &114821255269362748
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -95,5 +95,6 @@ MonoBehaviour:
   activeColor: {fileID: 2100000, guid: 0e6e951fc63504a4fbbb422b9ce07ad7, type: 2}
   inactiveColor: {fileID: 2100000, guid: b50508f17b0534ca59c55111c3f8c0d8, type: 2}
   depolarizedColor: {fileID: 2100000, guid: f16d6ac2055574dc8882341276f884af, type: 2}
+  burstedColor: {fileID: 2100000, guid: af786e5c3611c4582847ae3449dd195f, type: 2}
   cerllType: 0
   state: 0

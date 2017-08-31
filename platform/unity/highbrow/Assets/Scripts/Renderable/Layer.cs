@@ -13,42 +13,32 @@
 // along with this program.  If not, see http://www.gnu.org/licenses.
 // http://numenta.org/licenses/
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 
 namespace Numenta.Renderable
 {
+    /// <summary>
+    /// This class represents a single layer composed of <see cref="MiniColumn"/> 
+    /// </summary>
     public class Layer : MonoBehaviour
     {
         public LayerParameters parameters = LayerParameters.DEFAULT;
 
         /// <summary>
-        /// Instantiate all minicolumns
+        /// Calculate the Layer size based on the given <see cref="LayerParameters"/>.
         /// </summary>
-        /// <returns></returns>
-        IEnumerator InstantiateMinicolumns()
+        /// <returns>The layer size in local coordinates</returns>
+        /// <param name="parameters">Parameters used to calculate the size</param>
+        public static Vector3 GetSize(LayerParameters parameters)
         {
-            var cellSize = parameters.minicolumnParameters.cellSize;
-            var cellSpacing = parameters.minicolumnParameters.cellSpacing;
-            int dimX = (int)parameters.dimensions.x;
-            int dimY = (int)parameters.dimensions.y;
-            var halfX = dimX / 2;
-            GameObject prefab = Resources.Load("prefabs/MiniColumn") as GameObject;
-            for (int x = 0; x < dimX; x++)
-            {
-                for (int y = 0; y < dimY; y++)
-                {
-                    Vector3 location = new Vector3(
-                        (x - halfX) * (cellSize + cellSpacing),
-                        0,
-                        (y - halfX) * (cellSize + cellSpacing));
-                    var col = Instantiate(prefab, transform);
-                    var minicolumn = col.GetComponent<MiniColumn>();
-                    minicolumn.parameters = parameters.minicolumnParameters;
-                    col.transform.localPosition = location;
-                    col.name = $"Column {x + 1}, {y + 1}";
-                }
-            }
-            yield return null;
+            Vector3 columnSize = MiniColumn.GetSize(parameters.minicolumnParameters);
+            float x = parameters.dimensions.x;
+            float y = parameters.dimensions.y;
+            float spacing = parameters.spacing;
+            return new Vector3(x * (columnSize.x + spacing),  
+                               columnSize.y, 
+                               y * (columnSize.z + spacing));
         }
 
         public MiniColumn GetMinicolumn(int i)
@@ -57,28 +47,61 @@ namespace Numenta.Renderable
         }
 
         /// <summary>
-        /// Start is called on the frame when a script is enabled just before
-        /// any of the Update methods is called the first time.
+        /// Coroutine used to instantiate all minicolumns 
         /// </summary>
-        void Start()
+        /// <returns></returns>
+        IEnumerator InstantiateMinicolumns()
         {
-            StartCoroutine(InstantiateMinicolumns());
+            GameObject prefab = Resources.Load("prefabs/MiniColumn") as GameObject;
+
+            int dimX = (int)parameters.dimensions.x;
+            int dimY = (int)parameters.dimensions.y;
+
+            Vector3 size = GetSize(parameters);
+			float width = size.x / dimX;
+			float depth = size.z / dimY;
+
+            Vector3 location = transform.position;
+            location.x -= (size.x - width) / 2;
+            location.z -= (size.z - depth) / 2;
+			for (int x = 0; x < dimX; x++)
+            {
+                for (int y = 0; y < dimY; y++)
+                {
+                    var col = Instantiate(prefab);
+                    col.name = $"Column {x + 1}, {y + 1}";
+                    var minicolumn = col.GetComponent<MiniColumn>();
+                    minicolumn.parameters = parameters.minicolumnParameters;
+
+                    col.transform.localPosition = location + new Vector3(x * width, 0, y * depth);
+                    col.transform.parent = transform;
+                }
+            }
+            yield return null;
         }
+
         IEnumerator Blink(Neuron cell, Neuron.State state, float seconds = 1f)
         {
             cell.state = state;
             yield return new WaitForSeconds(seconds);
             cell.state = Neuron.State.Inactive;
         }
+
         IEnumerator Blink(MiniColumn col, MiniColumn.State state, float seconds = 1f)
         {
             col.state = state;
             yield return new WaitForSeconds(seconds);
             col.state = MiniColumn.State.Inactive;
         }
-        /// <summary>
-        /// Update is called every frame, if the MonoBehaviour is enabled.
-        /// </summary>
+
+        #region MonoBehaviour
+
+        void Start()
+        {
+            StartCoroutine(InstantiateMinicolumns());
+            this.name = parameters.name;
+        }
+
         void Update()
         {
             int i = (int)(Random.value * transform.childCount);
@@ -98,25 +121,16 @@ namespace Numenta.Renderable
                 StartCoroutine(Blink(cell, Neuron.State.Depolarized));
             }
         }
-        /// <summary>
-        /// Callback to draw gizmos that are pickable and always drawn.
-        /// </summary>
+
         void OnDrawGizmos()
         {
+            //if (EditorApplication.isPlaying) return;
+
             Gizmos.color = new Color(0, 1, 0, 0.5f);
-            var cellSize = parameters.minicolumnParameters.cellSize;
-            var cellSpacing = parameters.minicolumnParameters.cellSpacing;
-            var numOfCells = parameters.minicolumnParameters.numOfCells;
-            var x = parameters.dimensions.x;
-            var y = parameters.dimensions.y;
-            Vector3 size = new Vector3((cellSize + cellSpacing) * x,
-                            numOfCells * (cellSize + cellSpacing),
-                            (cellSize + cellSpacing) * y);
-            Vector3 offset = new Vector3(
-                -(cellSize + cellSpacing) / 2,
-                size.y / 2,
-                -(cellSize + cellSpacing) / 2);
-            Gizmos.DrawCube(transform.position + offset, size);
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawCube(Vector3.zero, GetSize(parameters));
+            Handles.Label(transform.position, parameters.name);
         }
+        #endregion
     }
 }

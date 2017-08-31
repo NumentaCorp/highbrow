@@ -16,6 +16,9 @@ using UnityEngine;
 
 namespace Numenta.Renderable
 {
+    /// <summary>
+    /// This class represents a single neuron
+    /// </summary>
     public class Neuron : MonoBehaviour
     {
         public enum CellType
@@ -31,62 +34,61 @@ namespace Numenta.Renderable
             Active,
             Depolarized
         }
+
         [Tooltip("Material associated with the 'Active' state")]
         public Material activeColor;
         [Tooltip("Material associated with the 'Inactive' state")]
         public Material inactiveColor;
-        [Tooltip("Material associated with the 'Depolarized' state")]
-        public Material depolarizedColor;
-
-        [Tooltip("Cell Type")]
+		[Tooltip("Material associated with the 'Depolarized' state")]
+		public Material depolarizedColor;
+		[Tooltip("Material associated with the 'Bursted' minicolumn")]
+		public Material burstedColor;
+		[Tooltip("Cell Type")]
         public CellType cerllType;
-
         [Tooltip("Current neuron state")]
         public State state = State.Inactive;
 
-        /// <summary>
-        /// Callback to draw gizmos that are pickable and always drawn.
-        /// </summary>
-        void OnDrawGizmos()
-        {
-            Mesh mesh = GetComponent<MeshFilter>().mesh;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawWireMesh(mesh);
-        }
-
         State _oldState = State.Inactive;
+        MiniColumn _minicolumn;
+        bool _bursted = false;
 
-        /// <summary>
-        /// Update is called every frame, if the MonoBehaviour is enabled.
-        /// </summary>
+        Vector3 _startScale;
+        void Start()
+        {
+			_minicolumn = GetComponentInParent<MiniColumn>();
+			_startScale = transform.localScale;
+        }
         void Update()
         {
-            UpdateState();
-        }
-
-        void UpdateState()
-        {
-            if (state == _oldState)
-            {
-                return;
-            }
             var rend = GetComponent<Renderer>();
-            switch (state)
+            // Special case for bursted minicolumn
+            if (_minicolumn != null && _minicolumn.state == MiniColumn.State.Active)
             {
-                case State.Active:
-                    rend.sharedMaterial = activeColor;
-                    break;
-                case State.Depolarized:
-                    rend.sharedMaterial = depolarizedColor;
-                    break;
-                case State.Inactive:
-                    rend.sharedMaterial = inactiveColor;
-                    break;
-                default:
-					rend.sharedMaterial = inactiveColor;
-					break;
+                rend.sharedMaterial = burstedColor;
+                transform.localScale = _startScale / 2;
+                _bursted = true;
             }
-            _oldState = state;
+            else if (state != _oldState || _bursted)
+            {
+                _bursted = false;
+                transform.localScale = _startScale;
+                switch (state)
+                {
+                    case State.Active:
+                        rend.sharedMaterial = activeColor;
+                        break;
+                    case State.Depolarized:
+                        rend.sharedMaterial = depolarizedColor;
+                        break;
+                    case State.Inactive:
+                        rend.sharedMaterial = inactiveColor;
+                        break;
+                    default:
+                        rend.sharedMaterial = inactiveColor;
+                        break;
+                }
+                _oldState = state;
+            }
         }
     }
 }

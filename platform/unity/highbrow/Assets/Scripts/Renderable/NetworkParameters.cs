@@ -12,31 +12,17 @@
 // You should have received a copy of the GNU Affero Public License
 // along with this program.  If not, see http://www.gnu.org/licenses.
 // http://numenta.org/licenses/
+using UnityEngine;
 using System;
 using System.Collections;
-using UnityEngine;
-
 namespace Numenta.Renderable
 {
     [Serializable]
-    public struct MiniColumnParameters
+    public struct NetworkParameters
     {
-        [Tooltip("Number of cells per minicolumn")]
-        [Range(1, 100)]
-        public int numOfCells;
-        [Tooltip("Cell spacing in millimeters")]
-		public float spacing;
-        [Tooltip("Cell soma size in millimeters")]
-		public float cellSize;
-        [Tooltip("Neuron cell type")]
-        public Neuron.CellType cellType;
-
-        public static readonly MiniColumnParameters DEFAULT = new MiniColumnParameters
-        {
-            numOfCells = 1,
-            spacing = 0.005f,
-            cellSize = 0.020f,
-            cellType = Neuron.CellType.Pyramidal
-        };
-    }
+		[Tooltip("Network Name")]
+		public string name;
+		[Tooltip("Cortical Columns")]
+		public CorticalColumnParameters[] columns;
+	}
 }

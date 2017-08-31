@@ -19,24 +19,18 @@ using UnityEngine;
 namespace Numenta.Renderable
 {
     [Serializable]
-    public struct MiniColumnParameters
+    public struct CorticalColumnParameters
     {
-        [Tooltip("Number of cells per minicolumn")]
-        [Range(1, 100)]
-        public int numOfCells;
-        [Tooltip("Cell spacing in millimeters")]
-		public float spacing;
-        [Tooltip("Cell soma size in millimeters")]
-		public float cellSize;
-        [Tooltip("Neuron cell type")]
-        public Neuron.CellType cellType;
+        [Tooltip("Column Name")]
+        public string name;
+		[Tooltip("Column Layers")]
+		public LayerParameters[] layers;
+        [Tooltip("Spacing between columns")]
+        public float spacing;
 
-        public static readonly MiniColumnParameters DEFAULT = new MiniColumnParameters
+        public static readonly CorticalColumnParameters DEFAULT = new CorticalColumnParameters
         {
-            numOfCells = 1,
-            spacing = 0.005f,
-            cellSize = 0.020f,
-            cellType = Neuron.CellType.Pyramidal
+            spacing = 0
         };
     }
 }

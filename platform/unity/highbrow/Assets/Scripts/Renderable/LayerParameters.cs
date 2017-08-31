@@ -21,15 +21,20 @@ namespace Numenta.Renderable
     [Serializable]
     public struct LayerParameters
     {
+        [Tooltip("Layer Name")]
+        public string name;
         [Tooltip("Number of minicolumns per dimension")]
         public Vector2 dimensions;
         [Tooltip("Minicolumn Parameters")]
         public MiniColumnParameters minicolumnParameters;
+        [Tooltip("Spacing between layers")]
+        public float spacing;
 
         public static readonly LayerParameters DEFAULT = new LayerParameters
         {
             dimensions = Vector2.one,
-            minicolumnParameters = MiniColumnParameters.DEFAULT
+            minicolumnParameters = MiniColumnParameters.DEFAULT,
+            spacing = 0
         };
     }
 }
